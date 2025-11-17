@@ -13,6 +13,7 @@ export const Playlist: React.FC = () => {
   const { topTracks, artist, loading, error } = useSpotify()
   const { accessToken, login } = useAuth()
   const { deviceId, playerReady } = useWebPlayback()
+  const web = useWebPlayback()
 
   useEffect(() => {
     const onState = (e: Event) => {
@@ -24,6 +25,13 @@ export const Playlist: React.FC = () => {
     window.addEventListener('miniPlayerState' as any, onState)
     return () => window.removeEventListener('miniPlayerState' as any, onState)
   }, [])
+
+  // When using SDK, keep the playlist selection in sync by matching the SDK current track URI
+  useEffect(() => {
+    if (!web?.track || !topTracks?.length) return
+    const idx = topTracks.findIndex((t: any) => t?.uri === web.track?.uri)
+    if (idx >= 0 && idx !== currentIndex) setCurrentIndex(idx)
+  }, [web?.track?.uri, topTracks, currentIndex])
 
   if (loading) {
     return (
@@ -47,7 +55,10 @@ export const Playlist: React.FC = () => {
 
   const coverList = [coverA, coverB, coverC]
   const activeTrack = topTracks[currentIndex] ?? topTracks[0]
-  const coverUrl = activeTrack?.album?.images?.[0]?.url || coverList[currentIndex % coverList.length]
+  // If SDK is active, prefer its current track/cover for the header
+  const usingSdk = !!(web?.playerReady && web.track)
+  const headerCover = usingSdk ? web.track?.cover : activeTrack?.album?.images?.[0]?.url
+  const coverUrl = headerCover || coverList[currentIndex % coverList.length]
 
   const playViaMiniPlayer = async (index: number) => {
     const t = topTracks[index]
@@ -61,11 +72,13 @@ export const Playlist: React.FC = () => {
           headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({ device_ids: [deviceId], play: true }),
         })
-        // Start playback of the specific track URI
+        // Build a play queue (full list) so next/prev work reliably
+        const uris: string[] = topTracks.map((x: any) => x?.uri).filter(Boolean)
+        const offset = Math.max(0, Math.min(uris.length - 1, index))
         await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
           method: 'PUT',
           headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({ uris: [t.uri] }),
+          body: JSON.stringify({ uris, offset: { position: offset } }),
         })
         setCurrentIndex(index)
         setIsPlaying(true)
@@ -109,7 +122,7 @@ export const Playlist: React.FC = () => {
       <div className="container">
         <div className="playlist-header reveal-left active">
           <div className="album-visual" style={{ ['--disc-color' as any]: '#5A8DEE' }}>
-            <div className={`disc${isPlaying ? ' spinning' : ''}`} aria-hidden="true">
+            <div className={`disc${(usingSdk ? web.isPlaying : isPlaying) ? ' spinning' : ''}`} aria-hidden="true">
               <div className="disc-grooves" />
               <div className="disc-hole" />
               <div className="disc-cover" style={{ backgroundImage: `url(${coverUrl})` }} />
@@ -122,9 +135,9 @@ export const Playlist: React.FC = () => {
             <div className="playlist-actions">
               <button
                 className="btn btn-primary play-big"
-                onClick={() => (isPlaying ? togglePlayPause() : playViaMiniPlayer(currentIndex))}
+                onClick={() => ((usingSdk ? web.isPlaying : isPlaying) ? (usingSdk ? web.togglePlay() : togglePlayPause()) : playViaMiniPlayer(currentIndex))}
               >
-                {isPlaying ? 'Pause' : 'Play'}
+                {(usingSdk ? web.isPlaying : isPlaying) ? 'Pause' : 'Play'}
               </button>
               {!accessToken && (
                 <button className="btn btn-secondary" onClick={login} title="Login with Spotify to play full tracks">
@@ -132,11 +145,11 @@ export const Playlist: React.FC = () => {
                 </button>
               )}
             </div>
-            {activeTrack && (
+            {(usingSdk ? web.track : activeTrack) && (
               <div className="now-playing">
                 <span className="np-label">Now Playing</span>
-                <span className="np-title">{activeTrack.name}</span>
-                <span className="np-artist">{activeTrack.artists?.map((a: any) => a.name).join(', ')}</span>
+                <span className="np-title">{usingSdk ? web.track?.title : activeTrack.name}</span>
+                <span className="np-artist">{usingSdk ? web.track?.artist : activeTrack.artists?.map((a: any) => a.name).join(', ')}</span>
               </div>
             )}
           </div>

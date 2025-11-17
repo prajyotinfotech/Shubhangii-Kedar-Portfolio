@@ -133,8 +133,22 @@ export const SpotifyWebPlaybackProvider: React.FC<{ children: React.ReactNode }>
     })
   }
 
+  const ensureActive = async () => {
+    if (!accessToken || !deviceId) return
+    try {
+      await fetch('https://api.spotify.com/v1/me/player', {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ device_ids: [deviceId], play: false }),
+      })
+    } catch (e) {
+      console.warn('ensureActive failed (will continue):', e)
+    }
+  }
+
   const togglePlay = async () => {
     try {
+      await ensureActive()
       await api('me/player/' + (isPlaying ? 'pause' : 'play'), 'PUT')
     } catch (e) {
       console.error('togglePlay failed', e)
@@ -142,6 +156,7 @@ export const SpotifyWebPlaybackProvider: React.FC<{ children: React.ReactNode }>
   }
   const next = async () => {
     try {
+      await ensureActive()
       await api('me/player/next', 'POST')
     } catch (e) {
       console.error('next failed', e)
@@ -149,6 +164,7 @@ export const SpotifyWebPlaybackProvider: React.FC<{ children: React.ReactNode }>
   }
   const previous = async () => {
     try {
+      await ensureActive()
       await api('me/player/previous', 'POST')
     } catch (e) {
       console.error('previous failed', e)
@@ -156,6 +172,7 @@ export const SpotifyWebPlaybackProvider: React.FC<{ children: React.ReactNode }>
   }
   const seekTo = async (ms: number) => {
     try {
+      await ensureActive()
       await api(`me/player/seek?position_ms=${Math.max(0, Math.floor(ms))}`, 'PUT')
     } catch (e) {
       console.error('seek failed', e)

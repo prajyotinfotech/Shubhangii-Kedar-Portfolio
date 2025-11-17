@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useMiniPlayer } from '../hooks/useMiniPlayer'
 import { useWebPlayback } from '../contexts/SpotifyWebPlaybackContext'
 
@@ -49,11 +50,27 @@ export const MiniPlayer = () => {
     formatTime,
   } = useMiniPlayer()
 
+  // Auto-expand when SDK starts playing
+  useEffect(() => {
+    if (usingSdk && web.isPlaying && collapsed) setCollapsed(false)
+  }, [usingSdk, web.isPlaying, collapsed, setCollapsed])
+
+  // Also respond to global miniPlayerState events (from SDK context) to expand when playback starts
+  useEffect(() => {
+    const onState = (e: Event) => {
+      const detail = (e as CustomEvent).detail as { isPlaying?: boolean }
+      if (detail?.isPlaying) setCollapsed(false)
+    }
+    window.addEventListener('miniPlayerState' as any, onState)
+    return () => window.removeEventListener('miniPlayerState' as any, onState)
+  }, [])
+
   // Choose data source: Spotify SDK when available, otherwise local mini player
   const uiTrack = usingSdk
-    ? { title: web.track?.title || '', artist: web.track?.artist || '', color: undefined, coverSrc: web.track?.cover }
+    ? (web.track ? { title: web.track?.title || '', artist: web.track?.artist || '', color: undefined, coverSrc: web.track?.cover } : null)
     : track
-  if (!uiTrack) return null
+  // Only render when we actually have something playing: SDK track present, or local is actively playing
+  if ((usingSdk && !uiTrack) || (!usingSdk && !isPlaying)) return null
 
   const current = usingSdk ? web.position / 1000 : time.current
   const duration = usingSdk ? web.duration / 1000 : time.duration
@@ -72,8 +89,8 @@ export const MiniPlayer = () => {
           }}
         />
         <div className="mini-text">
-          <div className="mini-title">{uiTrack.title}</div>
-          <div className="mini-artist">{uiTrack.artist}</div>
+          <div className="mini-title">{(uiTrack as any).title}</div>
+          <div className="mini-artist">{(uiTrack as any).artist}</div>
         </div>
       </div>
 
