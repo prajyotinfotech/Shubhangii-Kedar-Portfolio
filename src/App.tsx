@@ -1,5 +1,4 @@
 import './App.css'
-import { Link } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
 import HangingMic from './components/HangingMic'
@@ -35,11 +34,6 @@ function App() {
               <Hero />
               <FeatureBar />
               <About />
-              <div className="follow-journey-container">
-                <Link to="/journey" className="follow-journey-button">
-                  Follow My Journey
-                </Link>
-              </div>
               <Playlist />
               <Music />
               <Events />
@@ -51,6 +45,9 @@ function App() {
             </main>
             <Footer />
             <MiniPlayer />
+            <a href="/journey" className="follow-journey-button follow-fab" aria-label="Follow My Journey">
+             Follow My Journey
+            </a>
           </div>
         </SpotifyProvider>
       </SpotifyWebPlaybackProvider>

@@ -322,15 +322,16 @@ a {
 .hanging-mic {
     position: fixed;
     top: 0;
-    left: 20px;  /* Reduced from 50px to move it more to the left */
+    right: 24px;
+    left: auto;
     height: 100vh;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
     z-index: 1000;
-    pointer-events: none;
-    transform: translateX(0); /* Remove any transform that might affect positioning */
+    pointer-events: auto; /* allow dragging */
+    transform: translateX(0);
 }
 
 /* Adjust the mic wire positioning */
@@ -368,9 +369,7 @@ a {
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-    .hanging-mic {
-        left: 10px;  /* Even closer to the edge on mobile */
-    }
+    .hanging-mic { right: 14px; left: auto; }
     
     .mic-image {
         width: 35px;  /* Slightly smaller on mobile */
@@ -1849,6 +1848,27 @@ html.is-playing .disc { animation: spinDisc 6s linear infinite; }
   .follow-journey-button {
     padding: 1rem 2rem;
     font-size: 1rem;
+  }
+}
+
+/* Floating small FAB version for bottom-right */
+.follow-fab {
+  position: fixed;
+  right: max(16px, env(safe-area-inset-right));
+  bottom: max(16px, env(safe-area-inset-bottom));
+  z-index: 1200;
+  padding: 8px 12px;
+  font-size: 12px;
+  border-radius: 9999px;
+  box-shadow: 0 10px 24px rgba(29,185,84,0.35);
+}
+
+@media (max-width: 640px) {
+  .follow-fab {
+    padding: 8px 12px;
+    font-size: 12px;
+    right: max(12px, env(safe-area-inset-right));
+    bottom: max(12px, env(safe-area-inset-bottom));
   }
 }
 
