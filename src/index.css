@@ -7,6 +7,67 @@
     font-display: swap;
 }
 
+/* Booking (Contact) Section */
+.booking {
+  padding: 120px 0;
+  background: var(--dark-100);
+}
+
+.booking-intro {
+  color: var(--text-light);
+  font-size: 16px;
+  line-height: 1.8;
+  max-width: 820px;
+  margin-bottom: 28px;
+}
+
+.booking-form {
+  background: var(--panel-color);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: var(--elev-1);
+}
+
+.hidden { display: none; }
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.form-field { display: flex; flex-direction: column; gap: 8px; }
+.form-field.full { grid-column: 1 / -1; }
+
+.form-field label { color: #fff; font-size: 14px; }
+.form-field input,
+.form-field textarea {
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.04);
+  color: var(--text-color);
+}
+.form-field textarea { resize: vertical; }
+
+.form-actions { margin-top: 8px; }
+
+.privacy-note {
+  margin-top: 14px;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.booking-success { margin-top: 16px; color: #b0ffb8; }
+.booking-error { margin-top: 16px; color: #ffb0b0; }
+
+@media (max-width: 768px) {
+  .booking { padding: 90px 0; }
+  .form-row { grid-template-columns: 1fr; }
+}
+
 /* Mobile nav overlay (click to close) */
 .nav-overlay {
     position: fixed;

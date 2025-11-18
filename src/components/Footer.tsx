@@ -6,7 +6,7 @@ export const Footer: React.FC = () => {
     <footer className="footer">
       <div className="container">
         <div className="footer-top">
-          <div className="footer-brand">Aria Rose</div>
+          <div className="footer-brand">Shubhangii Kedar</div>
           <div className="footer-links">
             <a href="#home">Home</a>
             <a href="#events">Events</a>
@@ -22,7 +22,7 @@ export const Footer: React.FC = () => {
           </div>
         </div>
         <div className="footer-bottom">
-          <p>&copy; {new Date().getFullYear()} Aria Rose. All rights reserved.</p>
+          <p>&copy; {new Date().getFullYear()} Shubhangii Kedar. All rights reserved.</p>
         </div>
       </div>
     </footer>

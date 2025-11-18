@@ -10,7 +10,7 @@ import Playlist from './components/Playlist'
 import Gallery from './components/Gallery'
 import Testimonials from './components/Testimonials'
 import Newsletter from './components/Newsletter'
-import Contact from './components/Contact'
+import ContactBooking from './components/ContactBooking'
 import Footer from './components/Footer'
 import MiniPlayer from './components/MiniPlayer'
 import { useScrollReveal } from './hooks/useScrollReveal'
@@ -41,7 +41,7 @@ function App() {
               <Gallery />
               <Testimonials />
               <Newsletter />
-              <Contact />
+              <ContactBooking />
             </main>
             <Footer />
             <MiniPlayer />
