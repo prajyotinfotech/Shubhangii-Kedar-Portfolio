@@ -1,4 +1,8 @@
 import { useRef, useState } from 'react'
+import CountUp from './CountUp'
+import youtubeIcon from '../assets/icons/youtube.svg'
+import instagramIcon from '../assets/icons/instagram.svg'
+import musicIcon from '../assets/icons/music.svg'
 import slidePrimary from '../assets/3.png'
 import slideStudio from '../assets/backofthelatestR.png'
 import slideLive from '../assets/6.png'
@@ -20,6 +24,13 @@ type HeroSlide = {
   actions?: HeroAction[]
 }
 
+type PillKind = 'youtube' | 'tracks' | 'instagram'
+type PillStat = { kind: PillKind; top?: string; sub?: string; value: number; color: string; delta?: string }
+const HERO_PILLS: PillStat[] = [
+  { kind: 'youtube', top: 'YouTube channel', sub: 'subscribers', value: 408_000, color: '#FF0000' },
+  { kind: 'tracks', top: 'Songs', sub: 'Tracks', value: 58, color: '#1DB954' },
+  { kind: 'instagram', top: 'Instagram', sub: 'followers', value: 480_000, color: '#B84DFF' },
+]
 const heroSlides: HeroSlide[] = [
   {
     id: 'live-neon-stage',
@@ -140,6 +151,27 @@ export const Hero: React.FC = () => {
             ))}
           </h1>
           <p className="hero-subtitle">{currentSlide.subtitle}</p>
+          <div className="hero-pills">
+            {HERO_PILLS.map((p, idx) => (
+              <div className={`hero-pill ${p.kind}`} key={`${p.kind}-${idx}`}>
+                <span className="pill-icon" aria-hidden="true">
+                  {p.kind === 'youtube' && <img src={youtubeIcon} alt="" />}
+                  {p.kind === 'tracks' && <img src={musicIcon} alt="" />}
+                  {p.kind === 'instagram' && <img src={instagramIcon} alt="" />}
+                </span>
+                <div className="pill-body">
+                  {p.top && <span className="pill-top">{p.top}</span>}
+                  <span className="pill-value" style={{ color: '#fff' }}>
+                    <CountUp value={p.value} />
+                  </span>
+                  {p.sub && <span className="pill-sub">{p.sub}</span>}
+                </div>
+                {p.kind === 'instagram' && p.delta && (
+                  <span className="pill-delta">{p.delta}</span>
+                )}
+              </div>
+            ))}
+          </div>
           {currentSlide.actions && (
             <div className="hero-buttons">
               {currentSlide.actions.map((action) => (

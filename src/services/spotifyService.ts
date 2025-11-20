@@ -59,3 +59,13 @@ export const fetchArtistData = async (artistId: string) => {
   if (!res.ok) throw new Error(`Failed to fetch artist: ${res.status}`)
   return (await res.json()) as any
 }
+
+export const fetchPlaylistTracks = async (playlistId: string) => {
+  const token = await getAccessToken()
+  const res = await fetch(`${SPOTIFY_API_BASE}/playlists/${playlistId}/tracks?market=US`, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  if (!res.ok) throw new Error(`Failed to fetch playlist tracks: ${res.status}`)
+  const data = await res.json()
+  return data.items as any[]
+}

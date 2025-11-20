@@ -2,7 +2,7 @@ import './App.css'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
 import HangingMic from './components/HangingMic'
-import FeatureBar from './components/FeatureBar'
+// import FeatureBar from './components/FeatureBar'
 import About from './components/About'
 import Music from './components/Music'
 import Events from './components/Events'
@@ -32,7 +32,7 @@ function App() {
             <HangingMic />
             <main>
               <Hero />
-              <FeatureBar />
+              {/* <FeatureBar /> */}
               <About />
               <Playlist />
               <Music />
