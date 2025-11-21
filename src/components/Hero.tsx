@@ -1,8 +1,9 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import CountUp from './CountUp'
 import youtubeIcon from '../assets/icons/youtube.svg'
 import instagramIcon from '../assets/icons/instagram.svg'
-import musicIcon from '../assets/icons/music.svg'
+// import musicIcon from '../assets/icons/music.svg'
+import spotifyIcon from '../assets/icons/spotify.svg'
 import slidePrimary from '../assets/3.png'
 import slideStudio from '../assets/backofthelatestR.png'
 import slideLive from '../assets/6.png'
@@ -27,9 +28,9 @@ type HeroSlide = {
 type PillKind = 'youtube' | 'tracks' | 'instagram'
 type PillStat = { kind: PillKind; top?: string; sub?: string; value: number; color: string; delta?: string }
 const HERO_PILLS: PillStat[] = [
-  { kind: 'youtube', top: 'YouTube channel', sub: 'subscribers', value: 408_000, color: '#FF0000' },
-  { kind: 'tracks', top: 'Songs', sub: 'Tracks', value: 58, color: '#1DB954' },
   { kind: 'instagram', top: 'Instagram', sub: 'followers', value: 480_000, color: '#B84DFF' },
+  { kind: 'youtube', top: 'YouTube', sub: 'Views', value: 540_000_000, color: '#FF0000' },
+  { kind: 'tracks', top: 'Streaming', sub: 'Views', value: 65_000_000, color: '#1DB954' },
 ]
 const heroSlides: HeroSlide[] = [
   {
@@ -72,10 +73,21 @@ export const Hero: React.FC = () => {
   const currentSlide = heroSlides[activeSlide]
   const touchStartX = useRef<number | null>(null)
   const touchDeltaX = useRef(0)
+  const [typedSubtitle, setTypedSubtitle] = useState('')
+  const [subtitleVisible, setSubtitleVisible] = useState(false)
+  const [subtitleComplete, setSubtitleComplete] = useState(false)
 
   const goToSlide = (index: number) => {
     setActiveSlide((index + heroSlides.length) % heroSlides.length)
   }
+
+  // Autoplay every 6 seconds
+  useEffect(() => {
+    const id = setInterval(() => {
+      setActiveSlide((s) => (s + 1) % heroSlides.length)
+    }, 7000)
+    return () => clearInterval(id)
+  }, [])
 
   const nextSlide = () => goToSlide(activeSlide + 1)
   const prevSlide = () => goToSlide(activeSlide - 1)
@@ -100,8 +112,39 @@ export const Hero: React.FC = () => {
     else prevSlide()
   }
 
+  useEffect(() => {
+    const subtitle = heroSlides[activeSlide]?.subtitle ?? ''
+    let startDelay: ReturnType<typeof setTimeout> | null = null
+    let typingTimer: ReturnType<typeof setTimeout> | null = null
+
+    setTypedSubtitle('')
+    setSubtitleVisible(false)
+    setSubtitleComplete(false)
+
+    if (!subtitle) return
+
+    const typeChar = (index: number) => {
+      setTypedSubtitle(subtitle.slice(0, index + 1))
+      if (index + 1 < subtitle.length) {
+        typingTimer = setTimeout(() => typeChar(index + 1), 35)
+      } else {
+        setSubtitleComplete(true)
+      }
+    }
+
+    startDelay = setTimeout(() => {
+      setSubtitleVisible(true)
+      typeChar(0)
+    }, 1100)
+
+    return () => {
+      if (startDelay) clearTimeout(startDelay)
+      if (typingTimer) clearTimeout(typingTimer)
+    }
+  }, [activeSlide])
+
   return (
-    <section id="home" className="hero">
+    <section id="home" className="hero" style={{ ['--hero-slide-duration' as any]: '6s' }}>
       <div
         className="hero-slider"
         aria-hidden="true"
@@ -150,19 +193,27 @@ export const Hero: React.FC = () => {
               </span>
             ))}
           </h1>
-          <p className="hero-subtitle">{currentSlide.subtitle}</p>
+          <p
+            className={`hero-subtitle${subtitleVisible ? ' is-visible' : ''}${
+              subtitleComplete ? ' is-complete' : ''
+            }`}
+            aria-live="polite"
+          >
+            {typedSubtitle}
+            <span className="typing-caret" aria-hidden="true" />
+          </p>
           <div className="hero-pills">
             {HERO_PILLS.map((p, idx) => (
               <div className={`hero-pill ${p.kind}`} key={`${p.kind}-${idx}`}>
                 <span className="pill-icon" aria-hidden="true">
                   {p.kind === 'youtube' && <img src={youtubeIcon} alt="" />}
-                  {p.kind === 'tracks' && <img src={musicIcon} alt="" />}
+                  {p.kind === 'tracks' && <img src={spotifyIcon} alt="" />}
                   {p.kind === 'instagram' && <img src={instagramIcon} alt="" />}
                 </span>
                 <div className="pill-body">
                   {p.top && <span className="pill-top">{p.top}</span>}
                   <span className="pill-value" style={{ color: '#fff' }}>
-                    <CountUp value={p.value} />
+                    <CountUp value={p.value} duration={3000} />
                   </span>
                   {p.sub && <span className="pill-sub">{p.sub}</span>}
                 </div>

@@ -15,33 +15,38 @@ export const CountUp = ({
 }: CountUpProps) => {
   const ref = useRef<HTMLSpanElement>(null)
   const [display, setDisplay] = useState(0)
-  const [hasAnimated, setHasAnimated] = useState(false)
+  const hasAnimatedRef = useRef(false)
 
   useEffect(() => {
     const node = ref.current
     if (!node) return
 
-    const step = Math.max(1, Math.floor(value / (duration / 16)))
-    let frame: number
+    let frame: number | null = null
 
-    const animate = () => {
-      setDisplay((prev) => {
-        const next = prev + step
-        if (next < value) {
-          frame = requestAnimationFrame(animate)
-          return next
+    const startAnimation = () => {
+      let start: number | null = null
+
+      const tick = (timestamp: number) => {
+        if (start === null) start = timestamp
+        const progress = Math.min((timestamp - start) / duration, 1)
+        const eased = 1 - Math.pow(1 - progress, 3) // easeOutCubic for smooth finish
+        const next = Math.round(eased * value)
+        setDisplay(next)
+
+        if (progress < 1) {
+          frame = requestAnimationFrame(tick)
         }
-        cancelAnimationFrame(frame)
-        return value
-      })
+      }
+
+      frame = requestAnimationFrame(tick)
     }
 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting && !hasAnimated) {
-            setHasAnimated(true)
-            frame = requestAnimationFrame(animate)
+          if (entry.isIntersecting && !hasAnimatedRef.current) {
+            hasAnimatedRef.current = true
+            startAnimation()
           }
         })
       },
@@ -50,10 +55,15 @@ export const CountUp = ({
 
     observer.observe(node)
     return () => {
-      cancelAnimationFrame(frame)
+      if (frame) cancelAnimationFrame(frame)
       observer.disconnect()
     }
-  }, [duration, hasAnimated, value])
+  }, [duration, value])
+
+  useEffect(() => {
+    hasAnimatedRef.current = false
+    setDisplay(0)
+  }, [value, duration])
 
   const formatted = formatter
     ? formatter(Math.min(display, value))

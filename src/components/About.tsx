@@ -1,6 +1,66 @@
 import portraitImg from '../assets/3b.png'
-// import { aboutStats } from '../data/content'
-// import { CountUp } from './CountUp'
+import { CountUp } from './CountUp'
+import instagramIcon from '../assets/icons/instagram.svg'
+import facebookIcon from '../assets/icons/facebook.svg'
+import youtubeIcon from '../assets/icons/youtube.svg'
+import spotifyIcon from '../assets/icons/spotify.svg'
+
+const ABOUT_METRICS = [
+  {
+    id: 'instagram-followers',
+    category: 'Instagram',
+    label: 'Followers',
+    value: 480_000,
+    display: '480K+',
+    icon: instagramIcon,
+    accent: '#E4405F',
+  },
+  {
+    id: 'facebook-followers',
+    category: 'Facebook',
+    label: 'Followers',
+    value: 487_000,
+    display: '487K+',
+    icon: facebookIcon,
+    accent: '#1877F2',
+  },
+  {
+    id: 'youtube-views',
+    category: 'YouTube',
+    label: 'Views',
+    value: 540_000_000,
+    display: '540M+',
+    icon: youtubeIcon,
+    accent: '#FF0033',
+  },
+  {
+    id: 'youtube-subs',
+    category: 'YouTube',
+    label: 'Subscribers',
+    value: 408_000,
+    display: '408K+',
+    icon: youtubeIcon,
+    accent: '#FF0033',
+  },
+  {
+    id: 'spotify-streams',
+    category: 'Spotify',
+    label: 'Streams',
+    value: 65_000_000,
+    display: '65M+',
+    icon: spotifyIcon,
+    accent: '#1DB954',
+  },
+  {
+    id: 'spotify-monthly',
+    category: 'Spotify',
+    label: 'Monthly Listeners',
+    value: 750_000,
+    display: '750K+',
+    icon: spotifyIcon,
+    accent: '#1DB954',
+  },
+]
 
 export const About: React.FC = () => {
   return (
@@ -25,14 +85,6 @@ export const About: React.FC = () => {
             <p className="about-text">
               With a growing fanbase and a goal to take Marathi music worldwide, she has made a strong mark as a performer who deeply connects with her audience. Her powerful stage presence, sweet voice, and creative approach make her a standout in the indie music scene.
             </p>
-            {/* <div className="stats">
-              {aboutStats.map((stat) => (
-                <div className="stat-item" key={stat.label}>
-                  <CountUp value={stat.value} className="stat-number" formatter={(v) => `${v}+`} />
-                  <p className="stat-label">{stat.label}</p>
-                </div>
-              ))}
-            </div> */}
           </div>
         </div>
 
@@ -55,30 +107,22 @@ export const About: React.FC = () => {
 
         {/* Social presence metrics */}
         <div className="about-metrics reveal-scale">
-          <div className="metric">
-            <div className="metric-number accent">480K+</div>
-            <div className="metric-label">Instagram Followers</div>
-          </div>
-          <div className="metric">
-            <div className="metric-number accent">487K+</div>
-            <div className="metric-label">Facebook Followers</div>
-          </div>
-          <div className="metric">
-            <div className="metric-number">540M+</div>
-            <div className="metric-label">Views across YouTube</div>
-          </div>
-          <div className="metric">
-            <div className="metric-number">408K+</div>
-            <div className="metric-label">YouTube Subscribers</div>
-          </div>
-          <div className="metric">
-            <div className="metric-number">65M+</div>
-            <div className="metric-label">Streams across Spotify</div>
-          </div>
-          <div className="metric">
-            <div className="metric-number">750K+</div>
-            <div className="metric-label">Spotify Monthly Listeners</div>
-          </div>
+          {ABOUT_METRICS.map((metric) => (
+            <div className="about-metric-card" key={metric.id}>
+              <div className="about-metric-icon" style={{ backgroundColor: `${metric.accent}22` }}>
+                <img src={metric.icon} alt="" />
+              </div>
+              <div className="about-metric-body">
+                <span className="about-metric-category">{metric.category}</span>
+                <CountUp
+                  value={metric.value}
+                  className="about-metric-value"
+                  formatter={() => metric.display}
+                />
+                <span className="about-metric-label">{metric.label}</span>
+              </div>
+            </div>
+          ))}
         </div>
 
         {/* Achievements */}
