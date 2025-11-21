@@ -5,8 +5,9 @@ import instagramIcon from '../assets/icons/instagram.svg'
 // import musicIcon from '../assets/icons/music.svg'
 import spotifyIcon from '../assets/icons/spotify.svg'
 import slidePrimary from '../assets/3.png'
-import slideStudio from '../assets/backofthelatestR.png'
-import slideLive from '../assets/6.png'
+import slideStudio from '../assets/6.png'
+import slideLive from '../assets/backofthelatestR.png'
+import slidePrimaryMobile from '../assets/mobile1stslide.png'
 
 const HERO_VIDEO = '' // Provide a video URL if available
 
@@ -23,6 +24,7 @@ type HeroSlide = {
   heading: string[]
   subtitle: string
   actions?: HeroAction[]
+  mobileImage?: string
 }
 
 type PillKind = 'youtube' | 'tracks' | 'instagram'
@@ -39,6 +41,7 @@ const heroSlides: HeroSlide[] = [
     alt: 'Shubhangi Kedar performing live',
     heading: ['Namaskar, I’m Shubhangii Kedar'],
     subtitle: 'A voice rooted in Maharashtra, resonating around the world',
+    mobileImage: slidePrimaryMobile,
     // actions: [
     //   { label: 'Listen Now', href: '#playlist', variant: 'primary' },
     //   { label: 'Book Me', href: '#contact', variant: 'secondary' },
@@ -85,7 +88,7 @@ export const Hero: React.FC = () => {
   useEffect(() => {
     const id = setInterval(() => {
       setActiveSlide((s) => (s + 1) % heroSlides.length)
-    }, 7000)
+    }, 12000)
     return () => clearInterval(id)
   }, [])
 
@@ -158,13 +161,26 @@ export const Hero: React.FC = () => {
             key={slide.id}
             className={`hero-slide${index === activeSlide ? ' is-active' : ''}`}
           >
-            <img
-              src={slide.image}
-              alt={slide.alt}
-              draggable={false}
-              loading={index === 0 ? 'eager' : 'lazy'}
-              decoding={index === 0 ? 'sync' : 'async'}
-            />
+            {slide.mobileImage ? (
+              <picture>
+                <source media="(max-width: 640px)" srcSet={slide.mobileImage} />
+                <img
+                  src={slide.image}
+                  alt={slide.alt}
+                  draggable={false}
+                  loading={index === 0 ? 'eager' : 'lazy'}
+                  decoding={index === 0 ? 'sync' : 'async'}
+                />
+              </picture>
+            ) : (
+              <img
+                src={slide.image}
+                alt={slide.alt}
+                draggable={false}
+                loading={index === 0 ? 'eager' : 'lazy'}
+                decoding={index === 0 ? 'sync' : 'async'}
+              />
+            )}
           </div>
         ))}
       </div>

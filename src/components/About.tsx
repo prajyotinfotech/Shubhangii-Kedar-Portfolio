@@ -1,4 +1,4 @@
-import portraitImg from '../assets/3b.png'
+import portraitImg from '../assets/6.png'
 import { CountUp } from './CountUp'
 import instagramIcon from '../assets/icons/instagram.svg'
 import facebookIcon from '../assets/icons/facebook.svg'
