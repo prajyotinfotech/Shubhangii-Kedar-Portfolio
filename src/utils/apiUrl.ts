@@ -9,7 +9,12 @@ function getDefaultProtocol(): string {
 }
 
 export function normalizeApiBaseUrl(value: string | undefined, fallback: string): string {
-    const rawValue = value?.trim() || fallback;
+    const trimmedValue = value?.trim();
+    if (trimmedValue === 'same-origin') {
+        return '';
+    }
+
+    const rawValue = trimmedValue || fallback;
     const withoutTrailingSlash = rawValue.replace(/\/+$/, '');
 
     if (ABSOLUTE_URL_PATTERN.test(withoutTrailingSlash)) {
