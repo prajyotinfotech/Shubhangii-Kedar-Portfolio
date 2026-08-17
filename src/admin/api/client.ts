@@ -41,6 +41,16 @@ async function handleResponse(response: Response) {
     return data;
 }
 
+// ============ Auth API ============
+
+/**
+ * Get which sign-in methods the server currently allows
+ */
+export async function getAuthMethods(): Promise<{ enabled: boolean; passwordLoginEnabled: boolean }> {
+    const response = await fetch(`${API_URL}/api/auth/google/status`);
+    return handleResponse(response);
+}
+
 // ============ Content API ============
 
 /**
