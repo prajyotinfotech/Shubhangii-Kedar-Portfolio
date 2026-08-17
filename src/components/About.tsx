@@ -91,7 +91,7 @@ export const About: React.FC = () => {
           <div className="about-image reveal-left">
             <div className="image-wrapper">
               <div className="image-placeholder" style={{ aspectRatio: (about as any).imageAspect || '4/5' }}>
-                <img src={about.image || portraitImg} alt={about.title || 'Shubhangii Kedar'} />
+                <img src={about.image || portraitImg} alt={about.title || 'Shubhangii Kedar'} loading="lazy" decoding="async" />
               </div>
               <div className="image-decoration"></div>
             </div>

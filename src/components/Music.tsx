@@ -110,7 +110,7 @@ export const Music: React.FC = () => {
                       📷
                     </a>
                   ) : release.imageUrl ? (
-                    <img src={release.imageUrl} alt={release.title} />
+                    <img src={release.imageUrl} alt={release.title} loading="lazy" decoding="async" />
                   ) : release.gradient ? (
                     <AlbumArt gradient={release.gradient} />
                   ) : null}

@@ -86,7 +86,7 @@ export default function StatsShowcase() {
                             } as React.CSSProperties}
                         >
                             <div className="stats-card-icon" style={{ backgroundColor: `${metric.accent}22` }}>
-                                <img src={ICON_MAP[metric.icon] || metric.icon} alt="" />
+                                <img src={ICON_MAP[metric.icon] || metric.icon} alt="" loading="lazy" decoding="async" />
                             </div>
                             <div className="stats-card-content">
                                 <span className="stats-card-category">{metric.category}</span>

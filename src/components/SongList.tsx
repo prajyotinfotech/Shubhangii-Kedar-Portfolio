@@ -49,6 +49,8 @@ export const SongList: React.FC = () => {
                   className="songlist-thumb"
                   src={song.thumbnail}
                   alt={song.title}
+                  loading="lazy"
+                  decoding="async"
                   style={{
                     objectPosition: song.thumbnailPosition
                       ? `${song.thumbnailPosition.x}% ${song.thumbnailPosition.y}%`
