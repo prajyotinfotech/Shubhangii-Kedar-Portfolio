@@ -88,6 +88,46 @@ export default function AboutEditor() {
         setContent(prev => ({ ...prev, metrics: newMetrics }));
     };
 
+    const addMetric = () => {
+        setContent(prev => ({
+            ...prev,
+            metrics: [...prev.metrics, {
+                id: `metric-${Date.now()}`,
+                category: 'New Platform',
+                label: 'Followers',
+                value: 0,
+                display: '',
+                accent: '#666666',
+                icon: ''
+            }]
+        }));
+    };
+
+    const removeMetric = (index: number) => {
+        setContent(prev => ({
+            ...prev,
+            metrics: prev.metrics.filter((_, i) => i !== index)
+        }));
+    };
+
+    const handleMetricLogoUpload = async (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+        setSaving(true);
+        try {
+            const result = await uploadImage(file);
+            setContent(prev => ({
+                ...prev,
+                metrics: prev.metrics.map((m, i) => i === index ? { ...m, icon: result.data.url } : m)
+            }));
+            setMessage({ type: 'success', text: 'Logo uploaded!' });
+        } catch {
+            setMessage({ type: 'error', text: 'Failed to upload logo' });
+        } finally {
+            setSaving(false);
+        }
+    };
+
     const handleAchievementChange = (index: number, value: string) => {
         const newAchievements = [...content.achievements];
         newAchievements[index] = value;
@@ -425,39 +465,48 @@ export default function AboutEditor() {
                 </div>
 
                 <div className="editor-section">
-                    <h3>Social Metrics</h3>
+                    <h3>Social Impact Metrics</h3>
+                    <p className="editor-hint">These cards appear in the “Social Impact” section on the homepage.</p>
                     {content.metrics.map((metric, idx) => (
                         <div key={metric.id} className="editor-item-box">
-                            <div className="editor-row">
+                            <div className="editor-row editor-row--3">
                                 <div className="editor-field">
-                                    <label>Category</label>
-                                    <input value={metric.category} onChange={(e) => handleMetricChange(idx, 'category', e.target.value)} />
+                                    <label>Platform Name</label>
+                                    <input value={metric.category} onChange={(e) => handleMetricChange(idx, 'category', e.target.value)} placeholder="e.g. Instagram" />
                                 </div>
                                 <div className="editor-field">
-                                    <label>Label</label>
-                                    <input value={metric.label} onChange={(e) => handleMetricChange(idx, 'label', e.target.value)} />
+                                    <label>Metric Name</label>
+                                    <input value={metric.label} onChange={(e) => handleMetricChange(idx, 'label', e.target.value)} placeholder="e.g. Followers" />
                                 </div>
                                 <div className="editor-field">
-                                    <label>Value</label>
-                                    <input type="number" value={metric.value} onChange={(e) => handleMetricChange(idx, 'value', parseInt(e.target.value))} />
+                                    <label>Number (for count-up)</label>
+                                    <input type="number" value={metric.value} onChange={(e) => handleMetricChange(idx, 'value', parseInt(e.target.value) || 0)} />
                                 </div>
                             </div>
-                            <div className="editor-row">
+                            <div className="editor-row editor-row--3">
                                 <div className="editor-field">
-                                    <label>Display String</label>
-                                    <input value={metric.display} onChange={(e) => handleMetricChange(idx, 'display', e.target.value)} />
+                                    <label>Shown As (e.g. 500K+)</label>
+                                    <input value={metric.display} onChange={(e) => handleMetricChange(idx, 'display', e.target.value)} placeholder="500K+" />
                                 </div>
                                 <div className="editor-field">
                                     <label>Accent Color</label>
                                     <input type="color" value={metric.accent} onChange={(e) => handleMetricChange(idx, 'accent', e.target.value)} />
                                 </div>
                                 <div className="editor-field">
-                                    <label>Icon (Slug)</label>
-                                    <input value={metric.icon} onChange={(e) => handleMetricChange(idx, 'icon', e.target.value)} />
+                                    <label>Logo (name or URL)</label>
+                                    <input value={metric.icon} onChange={(e) => handleMetricChange(idx, 'icon', e.target.value)} placeholder="instagram or https://..." />
                                 </div>
+                            </div>
+                            <div className="editor-row" style={{ alignItems: 'center', gap: '0.75rem' }}>
+                                {/^(https?:)?\//.test(metric.icon) && (
+                                    <img src={metric.icon} alt="" style={{ width: 32, height: 32, objectFit: 'contain', borderRadius: 6, background: '#f2f2f2', padding: 2 }} />
+                                )}
+                                <input type="file" accept="image/*" onChange={(e) => handleMetricLogoUpload(idx, e)} disabled={saving} style={{ width: 'auto' }} />
+                                <button type="button" className="editor-button editor-button--danger" onClick={() => removeMetric(idx)} style={{ marginLeft: 'auto' }}>Remove</button>
                             </div>
                         </div>
                     ))}
+                    <button type="button" className="editor-button" onClick={addMetric}>+ Add Metric</button>
                 </div>
 
                 <div className="editor-section">
