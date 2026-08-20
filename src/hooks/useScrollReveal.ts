@@ -3,10 +3,14 @@ import { useEffect } from 'react'
 const selectors = ['.reveal-left', '.reveal-right', '.reveal-scale']
 
 export const useScrollReveal = (deps: any[] = []) => {
-  // Whole-section fade-up (hero excluded — it has its own entrance animations)
+  // Whole-section fade-up. Excluded: hero (own entrance) and sections whose
+  // content animates itself (stats/music/gallery) — a section-level fade on
+  // top would mask their staggered card reveals.
   useEffect(() => {
     const sections = Array.from(
-      document.querySelectorAll<HTMLElement>('main > section:not(#home)'),
+      document.querySelectorAll<HTMLElement>(
+        'main > section:not(#home):not(#stats):not(#music):not(#gallery)',
+      ),
     )
     if (!sections.length) return
 
