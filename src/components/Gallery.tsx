@@ -242,7 +242,7 @@ function GalleryGrid({ items, offset = 0 }: { items: GalleryItem[]; offset?: num
         <div
           className="reveal-scale gallery-item"
           style={{
-            ['--delay' as any]: `${(offset + i) * 0.1}s`,
+            ['--reveal-delay' as any]: `${(i % 4) * 0.09}s`,
             position: 'relative',
             aspectRatio: item.type === 'video' ? resolveAspect(item.aspect || '16/9') : resolveAspect(item.aspect),
           }}
@@ -307,7 +307,7 @@ export const Gallery: React.FC = () => {
                     <div
                       className="reveal-scale gallery-item"
                       style={{
-                        ['--delay' as any]: `${(photoItems.length + i) * 0.1}s`,
+                        ['--reveal-delay' as any]: `${(i % 4) * 0.09}s`,
                         position: 'relative',
                         aspectRatio: resolveAspect(item.aspect || '16/9'),
                       }}
