@@ -204,12 +204,13 @@ router.post('/login', authLimiter, async (req, res, next) => {
 
 /**
  * GET /api/auth/google/status
- * Allows the login page to know whether Google login is configured
+ * Allows the login page to know which sign-in methods are available
  */
 router.get('/google/status', (req, res) => {
     res.json({
         success: true,
-        enabled: isGoogleLoginConfigured()
+        enabled: isGoogleLoginConfigured(),
+        passwordLoginEnabled: config.passwordLoginEnabled
     });
 });
 

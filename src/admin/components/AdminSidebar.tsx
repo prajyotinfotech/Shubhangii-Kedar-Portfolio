@@ -39,7 +39,7 @@ const navItems: NavItem[] = [
     },
     {
         path: '/admin/about',
-        label: 'About',
+        label: 'About & Impact',
         icon: (
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="12" cy="8" r="4" />
@@ -171,6 +171,15 @@ const navItems: NavItem[] = [
     }
 ];
 
+// Sidebar order: grouped by the job being done, mirroring the public page top-to-bottom
+const navGroups: { label: string | null; paths: string[] }[] = [
+    { label: null, paths: ['/admin/dashboard'] },
+    { label: 'Page Content', paths: ['/admin/hero', '/admin/about', '/admin/journey'] },
+    { label: 'Music & Shows', paths: ['/admin/music', '/admin/songlist', '/admin/events', '/admin/performed-at'] },
+    { label: 'Community', paths: ['/admin/gallery', '/admin/testimonials', '/admin/social'] },
+    { label: 'Settings', paths: ['/admin/contact', '/admin/booking-settings', '/admin/theme'] }
+];
+
 export default function AdminSidebar() {
     const { admin, logout } = useAdminAuth();
     const navigate = useNavigate();
@@ -190,17 +199,28 @@ export default function AdminSidebar() {
             </div>
 
             <nav className="admin-sidebar__nav">
-                {navItems.map((item) => (
-                    <NavLink
-                        key={item.path}
-                        to={item.path}
-                        className={({ isActive }) =>
-                            `admin-sidebar__link ${isActive ? 'admin-sidebar__link--active' : ''}`
-                        }
-                    >
-                        <span className="admin-sidebar__link-icon">{item.icon}</span>
-                        <span className="admin-sidebar__link-label">{item.label}</span>
-                    </NavLink>
+                {navGroups.map((group) => (
+                    <div key={group.label ?? 'main'} className="admin-sidebar__group">
+                        {group.label && (
+                            <span className="admin-sidebar__group-label">{group.label}</span>
+                        )}
+                        {group.paths.map((path) => {
+                            const item = navItems.find((i) => i.path === path);
+                            if (!item) return null;
+                            return (
+                                <NavLink
+                                    key={item.path}
+                                    to={item.path}
+                                    className={({ isActive }) =>
+                                        `admin-sidebar__link ${isActive ? 'admin-sidebar__link--active' : ''}`
+                                    }
+                                >
+                                    <span className="admin-sidebar__link-icon">{item.icon}</span>
+                                    <span className="admin-sidebar__link-label">{item.label}</span>
+                                </NavLink>
+                            );
+                        })}
+                    </div>
                 ))}
             </nav>
 

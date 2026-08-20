@@ -5,6 +5,7 @@ import facebookIcon from '../assets/icons/facebook.svg'
 import youtubeIcon from '../assets/icons/youtube.svg'
 import spotifyIcon from '../assets/icons/spotify.svg'
 import { useContentContext } from '../contexts/ContentContext'
+import { socialLinks as staticSocialLinks } from '../data/content'
 import './StatsShowcase.css'
 
 const ICON_MAP: Record<string, string> = {
@@ -20,6 +21,16 @@ export default function StatsShowcase() {
     const [isVisible, setIsVisible] = useState(false)
 
     const metrics = content?.about?.metrics || []
+    const socialLinks = content?.socialLinks || staticSocialLinks
+
+    // Map platform icon name -> profile link (same links the footer uses)
+    const linkFor = (icon?: string) => {
+        if (!icon) return undefined
+        const match = socialLinks.find(
+            (s: any) => s.icon?.toLowerCase() === icon.toLowerCase()
+        )
+        return match?.href && match.href !== '#' ? match.href : undefined
+    }
 
     // Sort metrics: YouTube -> Spotify -> Instagram -> Facebook
     const sortOrder = ['youtube', 'spotify', 'instagram', 'facebook']
@@ -76,17 +87,26 @@ export default function StatsShowcase() {
                 <p className="stats-subtitle">Numbers that tell our story</p>
 
                 <div className="stats-grid">
-                    {sortedMetrics.map((metric: any, idx: number) => (
-                        <div
+                    {sortedMetrics.map((metric: any, idx: number) => {
+                        const href = linkFor(metric.icon)
+                        const CardTag: any = href ? 'a' : 'div'
+                        return (
+                        <CardTag
                             key={metric.id}
-                            className={`stats-card ${isVisible ? 'visible' : ''}`}
+                            {...(href ? {
+                                href,
+                                target: '_blank',
+                                rel: 'noopener noreferrer',
+                                'aria-label': `${metric.category} profile`,
+                            } : {})}
+                            className={`stats-card ${isVisible ? 'visible' : ''} ${href ? 'clickable' : ''}`}
                             style={{
                                 '--delay': `${idx * 150}ms`,
                                 '--accent': metric.accent,
                             } as React.CSSProperties}
                         >
                             <div className="stats-card-icon" style={{ backgroundColor: `${metric.accent}22` }}>
-                                <img src={ICON_MAP[metric.icon] || metric.icon} alt="" />
+                                <img src={ICON_MAP[metric.icon] || metric.icon} alt="" loading="lazy" decoding="async" />
                             </div>
                             <div className="stats-card-content">
                                 <span className="stats-card-category">{metric.category}</span>
@@ -105,8 +125,9 @@ export default function StatsShowcase() {
                                 <span className="stats-card-label">{metric.label}</span>
                             </div>
                             <div className="stats-card-glow" style={{ background: `radial-gradient(circle, ${metric.accent}30 0%, transparent 70%)` }} />
-                        </div>
-                    ))}
+                        </CardTag>
+                        )
+                    })}
                 </div>
             </div>
         </section>

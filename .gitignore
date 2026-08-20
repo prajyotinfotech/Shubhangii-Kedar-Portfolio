@@ -28,3 +28,7 @@ dist-ssr
 graphify-out/
 
 graphify-out/cache/
+.vercel
+
+# Local AI context files
+.ai/

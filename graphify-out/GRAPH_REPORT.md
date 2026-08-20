@@ -1,11 +1,11 @@
-# Graph Report - /home/raviraj/Prajyot/pranya/Shubhangii-Kedar-Portfolio  (2026-05-04)
+# Graph Report - /home/raviraj/Prajyot/pranya/Shubhangii-Kedar-Portfolio  (2026-05-27)
 
 ## Corpus Check
-- 70 files · ~4,661,256 words
+- 71 files · ~4,661,359 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 286 nodes · 378 edges · 55 communities detected
+- 288 nodes · 380 edges · 56 communities detected
 - Extraction: 81% EXTRACTED · 19% INFERRED · 0% AMBIGUOUS · INFERRED: 73 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
@@ -65,6 +65,7 @@
 - [[_COMMUNITY_Community 52|Community 52]]
 - [[_COMMUNITY_Community 53|Community 53]]
 - [[_COMMUNITY_Community 54|Community 54]]
+- [[_COMMUNITY_Community 55|Community 55]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `updateSection()` - 27 edges
@@ -129,8 +130,8 @@ Cohesion: 0.31
 Nodes (7): clearAuthCookie(), decodeBase64UrlJson(), decodeGoogleCredential(), getBaseCookieOptions(), getGoogleJwks(), setAuthCookie(), verifyGoogleCredential()
 
 ### Community 9 - "Community 9"
-Cohesion: 0.31
-Nodes (5): ContentFetchError, fetchContent(), fetchSection(), readPersistentCache(), writePersistentCache()
+Cohesion: 0.29
+Nodes (6): ContentFetchError, fetchContent(), fetchSection(), isContentData(), readPersistentCache(), writePersistentCache()
 
 ### Community 10 - "Community 10"
 Cohesion: 0.25
@@ -146,7 +147,7 @@ Nodes (3): useAdminAuth(), AdminLayout(), AdminSidebar()
 
 ### Community 13 - "Community 13"
 Cohesion: 0.43
-Nodes (6): handleAdd(), handleDelete(), handleMoveDown(), handleMoveUp(), handleUpdate(), loadReleases()
+Nodes (6): handleAdd(), handleDelete(), handleMoveDown(), handleMoveUp(), handleUpdate(), loadItems()
 
 ### Community 14 - "Community 14"
 Cohesion: 0.43
@@ -312,6 +313,10 @@ Nodes (0):
 Cohesion: 1.0
 Nodes (0): 
 
+### Community 55 - "Community 55"
+Cohesion: 1.0
+Nodes (0): 
+
 ## Knowledge Gaps
 - **Thin community `Community 31`** (2 nodes): `errorHandler()`, `errorHandler.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
@@ -345,28 +350,30 @@ Nodes (0):
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 46`** (1 nodes): `rateLimit.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 47`** (1 nodes): `StatsShowcase.tsx`
+- **Thin community `Community 47`** (1 nodes): `[...path].js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 48`** (1 nodes): `Footer.tsx`
+- **Thin community `Community 48`** (1 nodes): `StatsShowcase.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 49`** (1 nodes): `CountUp.tsx`
+- **Thin community `Community 49`** (1 nodes): `Footer.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 50`** (1 nodes): `Icon.tsx`
+- **Thin community `Community 50`** (1 nodes): `CountUp.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 51`** (1 nodes): `Events.tsx`
+- **Thin community `Community 51`** (1 nodes): `Icon.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 52`** (1 nodes): `Journey.tsx`
+- **Thin community `Community 52`** (1 nodes): `Events.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 53`** (1 nodes): `TheShow.tsx`
+- **Thin community `Community 53`** (1 nodes): `Journey.tsx`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 54`** (1 nodes): `content.ts`
+- **Thin community `Community 54`** (1 nodes): `TheShow.tsx`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 55`** (1 nodes): `content.ts`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `updateSection()` connect `Community 1` to `Community 0`, `Community 2`, `Community 5`, `Community 6`, `Community 10`, `Community 13`, `Community 14`?**
-  _High betweenness centrality (0.061) - this node is a cross-community bridge._
+  _High betweenness centrality (0.060) - this node is a cross-community bridge._
 - **Why does `fetchSection()` connect `Community 0` to `Community 1`, `Community 2`, `Community 5`, `Community 6`, `Community 10`, `Community 13`, `Community 14`?**
   _High betweenness centrality (0.040) - this node is a cross-community bridge._
 - **Why does `uploadImage()` connect `Community 2` to `Community 0`, `Community 10`, `Community 5`?**

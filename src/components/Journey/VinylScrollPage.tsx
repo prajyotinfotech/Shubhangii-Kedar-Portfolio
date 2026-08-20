@@ -110,7 +110,7 @@ export default function VinylScrollPage() {
                                 <div className="vinyl-center-static" style={{ backgroundColor: milestone.color }}>
                                     <div className="label-highlight" />
                                     <div className="center-image">
-                                        <img src={milestone.image} alt={milestone.title} />
+                                        <img src={milestone.image} alt={milestone.title} loading="lazy" decoding="async" />
                                     </div>
                                     <div className="center-ring" style={{ borderColor: milestone.color }} />
                                     <div className="center-dot" />

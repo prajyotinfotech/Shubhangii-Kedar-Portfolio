@@ -3,8 +3,15 @@ import concertMic from '../assets/microphone.webp'
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
 
+const baseWire = 110
+const extraWire = 380
+
 export const HangingMic: React.FC = () => {
-  const [progress, setProgress] = useState(0)
+  const wireRef = useRef<HTMLDivElement>(null)
+  const bodyRef = useRef<HTMLDivElement>(null)
+  const targetProgressRef = useRef(0)
+  const currentProgressRef = useRef(0)
+  const smoothRafRef = useRef(0)
   const draggingRef = useRef(false)
   const startYRef = useRef(0)
   const startScrollRef = useRef(0)
@@ -16,34 +23,48 @@ export const HangingMic: React.FC = () => {
   const [isDragging, setIsDragging] = useState(false)
 
   useEffect(() => {
-    const updateProgress = () => {
-      const scrollTop = window.scrollY
-      const maxScrollable = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1)
-      const next = clamp(scrollTop / maxScrollable, 0, 1)
-      // Update immediately for a more instant feel
-      setProgress(next)
+    // Writes go straight to the DOM inside a rAF loop that eases toward the
+    // scroll position — no React re-render per scroll event, no jank.
+    const apply = (p: number) => {
+      const swing = Math.sin(p * Math.PI) * 5
+      const bob = Math.sin(p * Math.PI * 1.5) * 3
+      if (wireRef.current) wireRef.current.style.height = `${baseWire + extraWire * p}px`
+      if (bodyRef.current) bodyRef.current.style.transform = `translateY(${bob}px) rotate(${swing * 0.4}deg)`
     }
 
-    const onScroll = () => updateProgress()
-    const onResize = () => updateProgress()
+    const tick = () => {
+      const diff = targetProgressRef.current - currentProgressRef.current
+      if (Math.abs(diff) < 0.0004) {
+        currentProgressRef.current = targetProgressRef.current
+        apply(currentProgressRef.current)
+        smoothRafRef.current = 0
+        return
+      }
+      currentProgressRef.current += diff * 0.16
+      apply(currentProgressRef.current)
+      smoothRafRef.current = requestAnimationFrame(tick)
+    }
 
-    window.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('resize', onResize)
-    window.addEventListener('orientationchange', onResize)
-    updateProgress()
+    const updateTarget = () => {
+      const maxScrollable = Math.max(document.documentElement.scrollHeight - window.innerHeight, 1)
+      targetProgressRef.current = clamp(window.scrollY / maxScrollable, 0, 1)
+      if (!smoothRafRef.current) smoothRafRef.current = requestAnimationFrame(tick)
+    }
+
+    window.addEventListener('scroll', updateTarget, { passive: true })
+    window.addEventListener('resize', updateTarget)
+    window.addEventListener('orientationchange', updateTarget)
+    updateTarget()
+    currentProgressRef.current = targetProgressRef.current
+    apply(currentProgressRef.current)
 
     return () => {
-      window.removeEventListener('scroll', onScroll)
-      window.removeEventListener('resize', onResize)
-      window.removeEventListener('orientationchange', onResize)
+      window.removeEventListener('scroll', updateTarget)
+      window.removeEventListener('resize', updateTarget)
+      window.removeEventListener('orientationchange', updateTarget)
+      if (smoothRafRef.current) cancelAnimationFrame(smoothRafRef.current)
     }
   }, [])
-
-  const baseWire = 110
-  const extraWire = 380
-  const wireLength = baseWire + extraWire * progress
-  const swing = Math.sin(progress * Math.PI) * 5
-  const bob = Math.sin(progress * Math.PI * 1.5) * 3
 
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     draggingRef.current = true
@@ -152,13 +173,10 @@ export const HangingMic: React.FC = () => {
           pointerEvents: 'none',
         }}
       />
-      <div className="mic-wire" style={{ height: `${wireLength}px` }}>
+      <div className="mic-wire" ref={wireRef} style={{ height: `${baseWire}px` }}>
         <div className="mic-wire-glow" />
       </div>
-      <div
-        className="mic-body"
-        style={{ transform: `translateY(${bob}px) rotate(${swing * 0.4}deg)` }}
-      >
+      <div className="mic-body" ref={bodyRef}>
         <img src={concertMic} alt="" className="mic-image" draggable={false} style={{ pointerEvents: 'none', userSelect: 'none' }} />
       </div>
     </div>

@@ -3,6 +3,7 @@
  * Fetches content from backend API with fallback to static data
  */
 import { normalizeApiBaseUrl } from '../utils/apiUrl';
+import { optimizeContentImages } from '../utils/imageUrl';
 
 const API_URL = normalizeApiBaseUrl(import.meta.env.VITE_API_URL, 'http://localhost:5173');
 
@@ -270,19 +271,34 @@ export const COLOR_PRESETS = [
 // In-memory cache for content
 let contentCache: ContentData | null = null;
 let cacheTimestamp: number = 0;
-const CACHE_DURATION = 60000; // 1 minute cache
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minute cache
 
 // Persistent cache key for resilience when Gist is unreachable
 const PERSISTENT_CACHE_KEY = 'sk-content-cache-v1';
 
-function readPersistentCache(): ContentData | null {
+function isContentData(value: unknown): value is ContentData {
+    return Boolean(value && typeof value === 'object' && Object.keys(value as Record<string, unknown>).length > 0);
+}
+
+function readPersistentCache(maxAgeMs?: number): ContentData | null {
     try {
         const raw = typeof localStorage !== 'undefined' ? localStorage.getItem(PERSISTENT_CACHE_KEY) : null;
         if (!raw) return null;
         const parsed = JSON.parse(raw);
-        if (parsed && typeof parsed === 'object' && Object.keys(parsed).length > 0) {
-            return parsed as ContentData;
+
+        if (parsed && typeof parsed === 'object' && 'data' in parsed) {
+            const cached = parsed as { timestamp?: unknown; data?: unknown };
+            if (!isContentData(cached.data)) return null;
+            if (maxAgeMs && typeof cached.timestamp !== 'number') return null;
+            if (maxAgeMs && typeof cached.timestamp === 'number' && Date.now() - cached.timestamp > maxAgeMs) {
+                return null;
+            }
+            // Older caches may hold raw Cloudinary URLs; rewriting is idempotent.
+            return optimizeContentImages(cached.data);
         }
+
+        // Older cache format stored the content object directly.
+        if (!maxAgeMs && isContentData(parsed)) return optimizeContentImages(parsed);
     } catch { /* ignore corrupt cache */ }
     return null;
 }
@@ -290,7 +306,7 @@ function readPersistentCache(): ContentData | null {
 function writePersistentCache(data: ContentData): void {
     try {
         if (typeof localStorage === 'undefined') return;
-        localStorage.setItem(PERSISTENT_CACHE_KEY, JSON.stringify(data));
+        localStorage.setItem(PERSISTENT_CACHE_KEY, JSON.stringify({ timestamp: Date.now(), data }));
     } catch { /* quota errors — ignore */ }
 }
 
@@ -315,26 +331,33 @@ export async function fetchContent(): Promise<ContentData> {
         return contentCache;
     }
 
+    const persistentCache = readPersistentCache(CACHE_DURATION);
+    if (persistentCache) {
+        contentCache = persistentCache;
+        cacheTimestamp = now;
+        return persistentCache;
+    }
+
     // FORCE GIST STRATEGY as requested:
     // "frontend is not fetching data from gist file it should always fetch data from gist file"
     const GIST_RAW_URL = import.meta.env.VITE_GIST_RAW_URL || 'https://gist.githubusercontent.com/prajyotinfotech/9edd7314a8b2f69a855037af01072b7e/raw/content.json';
 
     try {
-        const timestamp = new Date().getTime();
-        const urlWithCacheBuster = `${GIST_RAW_URL}?t=${timestamp}`;
-        console.log('Fetching content from Gist:', urlWithCacheBuster);
-        const response = await fetch(urlWithCacheBuster, { cache: 'no-store' }); // Ensure fresh content
+        console.log('Fetching content from Gist:', GIST_RAW_URL);
+        const response = await fetch(GIST_RAW_URL);
 
         if (!response.ok) {
             throw new Error(`Gist fetch error: ${response.status} ${response.statusText}`);
         }
 
-        const data = await response.json();
+        const rawData = await response.json();
 
         // Basic validation to ensure it's not empty
-        if (!data || Object.keys(data).length === 0) {
+        if (!rawData || Object.keys(rawData).length === 0) {
             throw new Error('Gist content is empty or invalid');
         }
+
+        const data = optimizeContentImages(rawData as ContentData);
 
         contentCache = data;
         cacheTimestamp = now;

@@ -100,7 +100,7 @@ export const Testimonials: React.FC = () => {
                 )}
                 {isImage && imageUrl && (
                   <div style={{ width: '100%', marginBottom: '1rem', aspectRatio: aspect, overflow: 'hidden', borderRadius: '10px' }}>
-                    <img src={imageUrl} alt={item.author} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <img src={imageUrl} alt={item.author} loading="lazy" decoding="async" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   </div>
                 )}
                 {item.quote && (

@@ -588,7 +588,9 @@ a {
     position: relative;
     overflow: hidden;
     border-radius: 999px;
-    transition: height 0.08s linear;
+    /* smoothing happens in JS (rAF lerp); a CSS transition on top adds lag */
+    transition: none;
+    will-change: height;
 }
 
 .mic-wire-glow {
@@ -605,6 +607,7 @@ a {
     display: flex;
     justify-content: center;
     transform-origin: top center;
+    will-change: transform;
 }
 
 /* Make sure the mic image is properly sized and positioned */
@@ -692,6 +695,47 @@ a {
     flex-direction: column;
     align-items: flex-start;
     gap: 5px;
+    position: relative;
+}
+
+/* Soft drifting hue glow behind the hero headline/taglines */
+.hero-text::before {
+    content: '';
+    position: absolute;
+    top: -80px;
+    left: -100px;
+    width: min(620px, 85vw);
+    height: 360px;
+    background:
+        radial-gradient(ellipse at 30% 40%, var(--ring, rgba(29, 185, 84, 0.4)) 0%, transparent 60%),
+        radial-gradient(ellipse at 72% 62%, rgba(110, 80, 255, 0.22) 0%, transparent 65%);
+    filter: blur(70px);
+    opacity: 0.5;
+    z-index: -1;
+    pointer-events: none;
+    animation: heroHueGlow 14s ease-in-out infinite alternate;
+}
+
+@keyframes heroHueGlow {
+    0% {
+        filter: blur(70px) hue-rotate(0deg);
+        transform: translate3d(0, 0, 0) scale(1);
+    }
+
+    100% {
+        filter: blur(76px) hue-rotate(45deg);
+        transform: translate3d(36px, -14px, 0) scale(1.1);
+    }
+}
+
+.hero-title .line {
+    text-shadow: 0 0 32px var(--ring, rgba(29, 185, 84, 0.35));
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hero-text::before {
+        animation: none;
+    }
 }
 
 .hero-title {
@@ -3394,6 +3438,27 @@ html.is-playing .disc {
         opacity: 1 !important;
         transform: none !important;
         filter: none !important;
+        transition: none !important;
+    }
+}
+
+/* Whole-section entrance: subtle fade-up as each section scrolls into view.
+   The class is added by useScrollReveal at runtime, so pages without JS never hide content. */
+.section-reveal {
+    opacity: 0;
+    transform: translate3d(0, 28px, 0);
+    transition: opacity 0.8s ease, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.section-reveal.in-view {
+    opacity: 1;
+    transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .section-reveal {
+        opacity: 1 !important;
+        transform: none !important;
         transition: none !important;
     }
 }

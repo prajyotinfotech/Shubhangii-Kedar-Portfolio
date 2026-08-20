@@ -86,13 +86,17 @@ export const Music: React.FC = () => {
         <h2 className="section-title center">Latest Releases</h2>
         <div className="title-decoration center"></div>
         <div className="music-grid">
-          {data.map((release) => {
+          {data.map((release, idx) => {
             const ytEmbed = release.videoPlatform === 'youtube' && release.videoUrl
               ? getYouTubeEmbedUrl(release.videoUrl) : ''
             const primaryLink = release.spotifyUrl || release.youtubeUrl || release.instaUrl
 
             return (
-              <div className="music-card reveal-scale active" key={release.id}>
+              <div
+                className="music-card reveal-scale"
+                style={{ ['--reveal-delay' as any]: `${(idx % 3) * 0.12}s` }}
+                key={release.id}
+              >
                 <div className="album-art" style={release.aspect ? { aspectRatio: release.aspect } : undefined}>
                   {ytEmbed ? (
                     <iframe
@@ -110,7 +114,7 @@ export const Music: React.FC = () => {
                       📷
                     </a>
                   ) : release.imageUrl ? (
-                    <img src={release.imageUrl} alt={release.title} />
+                    <img src={release.imageUrl} alt={release.title} loading="lazy" decoding="async" />
                   ) : release.gradient ? (
                     <AlbumArt gradient={release.gradient} />
                   ) : null}

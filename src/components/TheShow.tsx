@@ -21,6 +21,8 @@ const TheShow: React.FC = () => {
                                 <img
                                     src={show.image}
                                     alt={show.title}
+                                    loading="lazy"
+                                    decoding="async"
                                     style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
                                 />
                             </div>

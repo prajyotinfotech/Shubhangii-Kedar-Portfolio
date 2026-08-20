@@ -63,7 +63,7 @@ export const PerformedAt: React.FC = () => {
               <div className="songlist-row" key={item.id || item.venue}>
                 <span className="songlist-index">{idx + 1}</span>
                 {thumbSrc ? (
-                  <img className="songlist-thumb" src={thumbSrc} alt={item.venue} />
+                  <img className="songlist-thumb" src={thumbSrc} alt={item.venue} loading="lazy" decoding="async" />
                 ) : (
                   <div className="songlist-thumb songlist-thumb--placeholder">&#9834;</div>
                 )}

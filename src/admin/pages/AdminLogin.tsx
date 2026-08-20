@@ -5,6 +5,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAdminAuth } from '../context/AdminAuthContext';
+import { getAuthMethods } from '../api/client';
 import './AdminLogin.css';
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
@@ -50,6 +51,9 @@ export default function AdminLogin() {
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+    // null = not known yet (render nothing); resolved from the server so the
+    // form matches what the login endpoint will actually accept
+    const [passwordLoginEnabled, setPasswordLoginEnabled] = useState<boolean | null>(null);
     const googleButtonRef = useRef<HTMLDivElement | null>(null);
     const { login, loginWithGoogle, isAuthenticated, isLoading: isAuthLoading } = useAdminAuth();
     const navigate = useNavigate();
@@ -146,6 +150,21 @@ export default function AdminLogin() {
         }
     }, [isAuthenticated, navigate]);
 
+    useEffect(() => {
+        let isCancelled = false;
+        getAuthMethods()
+            .then(methods => {
+                if (!isCancelled) setPasswordLoginEnabled(methods.passwordLoginEnabled);
+            })
+            .catch(() => {
+                // Status unavailable — show the form; the login endpoint stays the authority
+                if (!isCancelled) setPasswordLoginEnabled(true);
+            });
+        return () => {
+            isCancelled = true;
+        };
+    }, []);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
@@ -207,52 +226,56 @@ export default function AdminLogin() {
                         </div>
                     )}
 
-                    <div className="admin-login__divider">
-                        <span>or use admin password</span>
-                    </div>
+                    {passwordLoginEnabled === true && (
+                        <>
+                            <div className="admin-login__divider">
+                                <span>or use admin password</span>
+                            </div>
 
-                    <div className="admin-login__field">
-                        <label htmlFor="email">Email</label>
-                        <input
-                            id="email"
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            placeholder="admin@example.com"
-                            required
-                            disabled={isGoogleLoading}
-                            autoComplete="email"
-                        />
-                    </div>
+                            <div className="admin-login__field">
+                                <label htmlFor="email">Email</label>
+                                <input
+                                    id="email"
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    placeholder="admin@example.com"
+                                    required
+                                    disabled={isGoogleLoading}
+                                    autoComplete="email"
+                                />
+                            </div>
 
-                    <div className="admin-login__field">
-                        <label htmlFor="password">Password</label>
-                        <input
-                            id="password"
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="••••••••"
-                            required
-                            disabled={isGoogleLoading}
-                            autoComplete="current-password"
-                        />
-                    </div>
+                            <div className="admin-login__field">
+                                <label htmlFor="password">Password</label>
+                                <input
+                                    id="password"
+                                    type="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    placeholder="••••••••"
+                                    required
+                                    disabled={isGoogleLoading}
+                                    autoComplete="current-password"
+                                />
+                            </div>
 
-                    <button
-                        type="submit"
-                        className="admin-login__button"
-                        disabled={isLoading || isGoogleLoading}
-                    >
-                        {isLoading ? (
-                            <>
-                                <span className="admin-login__spinner"></span>
-                                Signing in...
-                            </>
-                        ) : (
-                            'Sign In'
-                        )}
-                    </button>
+                            <button
+                                type="submit"
+                                className="admin-login__button"
+                                disabled={isLoading || isGoogleLoading}
+                            >
+                                {isLoading ? (
+                                    <>
+                                        <span className="admin-login__spinner"></span>
+                                        Signing in...
+                                    </>
+                                ) : (
+                                    'Sign In'
+                                )}
+                            </button>
+                        </>
+                    )}
                 </form>
 
                 <div className="admin-login__footer">
